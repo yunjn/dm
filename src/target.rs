@@ -31,6 +31,10 @@ impl Target {
             let key: Vec<_> = line[0].split("_").collect();
             let idx = get_joint_idx(key[key.len() - 1]);
 
+            if idx == usize::MAX {
+                continue;
+            }
+
             if key[key.len() - 2] != state {
                 state = key[key.len() - 2];
                 targets.push(frame.clone());
