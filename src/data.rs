@@ -34,7 +34,7 @@ pub fn get_joint_idx(joint_name: &str) -> usize {
 
 pub struct MetaData {
     data: f64,
-    state: u8,// 0 settar | 1 inctar | 2 reset | 3 wait
+    t: u8, // 0 settar | 1 inctar | 2 reset | 3 wait
 }
 
 pub struct Target {

@@ -1,2 +1,4 @@
 /target
-assets
+assets/out
+assets/pcap
+Cargo.lock

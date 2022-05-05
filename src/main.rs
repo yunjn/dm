@@ -5,10 +5,12 @@ mod target;
 use data::*;
 
 fn main() {
-    // parser::parser("assets/pcap/long.pcapng");
-    let mut target = Target::from_pcap("assets/pcap/long.pcapng");
-    // target.print();
-    target.data = target.data[0..10].to_vec();
+    // let target = Target::from_editor("assets/test");
+    let target = Target::from_params("assets/out/test.txt");
+    // let mut target = Target::from_pcap("assets/pcap/long.pcapng");
+    // target.data = target.data[0..10].to_vec();
+    // target.into_skl("test");
     // target.into_editor("test");
-    target.into_skl_txt("abc");
+    // target.into_skl_txt("test");
+    target.print();
 }

@@ -3,7 +3,6 @@
 use crate::data::*;
 use pcap_file::pcapng::{ParsedBlock, PcapNgReader};
 use std::fs::File;
-use std::io::{Read, Write};
 
 fn format_data(msg: Vec<&str>) -> Vec<f64> {
     let mut frame = vec![0.0f64; 21];
@@ -67,11 +66,17 @@ pub fn parser(file_path: &str) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
 
     let mut speeds = Vec::new();
     // Parse the message sent by the agent
-    for msg in agent_send {
-        let msg = msg.replace(")", "");
+    // for msg in agent_send {
+    //     let msg = msg.replace(")", "");
+    //     let msg: Vec<_> = msg.split("(").collect();
+    //     speeds.push(format_data(msg));
+    // }
+
+    agent_send.iter().for_each(|mut msg| {
+        let msg = &msg.replace(")", "");
         let msg: Vec<_> = msg.split("(").collect();
         speeds.push(format_data(msg));
-    }
+    });
 
     println!(
         "robot receiving:[{}]  robot send:[{}]\nnumber of joints: {}",

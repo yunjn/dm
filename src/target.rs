@@ -5,21 +5,77 @@ use crate::parser::*;
 use std::fs::File;
 use std::io::{Read, Write};
 
+#[inline]
 fn inv(speed: f64, sensor_value: f64, previous_error: f64) -> f64 {
     (speed + 0.01 * previous_error) / 0.16 + sensor_value
 }
 
 impl Target {
-    // pub fn from_skl_txt(txt: &str, skl: &str) -> Target {
-    //     Target {}
-    // }
-    // pub fn from_editor(file_path: &str) -> Target {
-    //     Target {}
-    // }
+    pub fn from_params(file_path: &str) -> Target {
+        let mut lines = String::new();
+        let mut params_file = File::open(file_path).expect("Error opening params file");
+        params_file.read_to_string(&mut lines).unwrap();
+        let lines: Vec<_> = lines.split('\n').collect();
+
+        let mut targets: Vec<Vec<f64>> = Vec::new();
+        let mut frame = vec![0.0f64; 21];
+        frame[20] = 0.02;
+        let mut state = "s0";
+
+        for line in lines.iter() {
+            if line.starts_with("/") || line.starts_with("#") {
+                continue;
+            }
+
+            let line: Vec<_> = line.split("\t").collect();
+            let key: Vec<_> = line[0].split("_").collect();
+            let idx = get_joint_idx(key[key.len() - 1]);
+
+            if key[key.len() - 2] != state {
+                state = key[key.len() - 2];
+                targets.push(frame.clone());
+            }
+
+            frame[idx] = line[1].parse().unwrap_or(0.0);
+        }
+        targets.push(frame);
+        Target { data: targets }
+    }
+
+    pub fn from_editor(file_path: &str) -> Target {
+        let mut lines = String::new();
+        let mut editor_file = File::open(file_path).expect("Error opening editor file");
+        editor_file.read_to_string(&mut lines).unwrap();
+
+        let mut targets: Vec<Vec<f64>> = Vec::new();
+        let frames: Vec<_> = lines.split('\n').collect();
+
+        for frame_str in frames.iter() {
+            let frame_str: Vec<_> = frame_str.split(' ').collect();
+            // exclude blank line
+            if frame_str.len() <= 2 {
+                continue;
+            }
+            let frame_str = &frame_str[0..frame_str.len() - 2];
+            let wait: f64 = frame_str[0].parse().unwrap_or(200.0);
+            let frame_str = &frame_str[3..];
+            let mut frame: Vec<f64> = Vec::new();
+
+            frame_str
+                .iter()
+                .for_each(|v| frame.push(v.parse().unwrap_or(0.0)));
+
+            frame.push(wait);
+            targets.push(frame);
+        }
+        Target { data: targets }
+    }
+
     pub fn from_pcap(file_path: &str) -> Target {
-        let (sensor_values, mut speeds) = parser(file_path);
         let mut cur_err = vec![0.0; 20];
         let mut pre_err = vec![0.0; 20];
+
+        let (sensor_values, mut speeds) = parser(file_path);
 
         for i in 0..speeds.len() {
             pre_err = cur_err.clone();
@@ -51,9 +107,7 @@ impl Target {
     }
 
     pub fn print(&self) {
-        for frame in &self.data {
-            println!("\n{:?}", frame);
-        }
+        &self.data.iter().for_each(|frame| println!("{:?}", frame));
         println!("frames: {}", self.data.len());
     }
 
@@ -96,7 +150,9 @@ impl Target {
                 .write(right_str.as_bytes())
                 .expect("Error writing right");
 
-            let wait = String::from("\nwait ") + &frame[20].to_string() + " end\nENDSTATE\n\n";
+            let wait = String::from("\nwait ")
+                + &frame.get(20).unwrap_or(&0.02).to_string()
+                + " end\nENDSTATE\n\n";
             skill.write(wait.as_bytes()).expect("Error writing time");
         }
         skill
@@ -129,13 +185,15 @@ impl Target {
 
             for joint in &JOINT_NAMES {
                 let idx = get_joint_idx(joint);
+                // .skl
                 let joint_key = String::from(" EFF_") + &joint.to_uppercase() + " ";
                 let joint_val =
                     String::from("$") + file_name + "_s" + &frame_idx.to_string() + "_" + &joint;
 
-                let mut txt_joint_val = joint_val.clone();
-                txt_joint_val.remove(0); // remove '$'
-                let line = txt_joint_val + "\t" + &frame[idx].to_string() + "\n";
+                // .txt
+                let mut txt_joint_key = joint_val.clone();
+                txt_joint_key.remove(0); // remove '$'
+                let line = txt_joint_key + "\t" + &frame[idx].to_string() + "\n";
                 txt.write(line.as_bytes()).expect("Error writing params");
 
                 if &joint[0..1] == "l" {
@@ -149,7 +207,9 @@ impl Target {
             }
 
             frame_idx += 1;
-            let wait = String::from("\nwait ") + &frame[20].to_string() + " end\nENDSTATE\n\n";
+            let wait = String::from("\nwait ")
+                + &(frame.get(20).unwrap_or(&200.0) / 1000.0).to_string()
+                + " end\nENDSTATE\n\n";
 
             left_str.push_str(" end");
             right_str.push_str(" end");
@@ -179,12 +239,14 @@ impl Target {
             .expect("Error creating file");
 
         for frame in &self.data {
-            let line = (frame[20] * 1000.0).to_string();
+            let line = (frame.get(20).unwrap_or(&0.02) * 1000.0).to_string();
             let mut line = line + " 0 0 ";
+
             for joint in &JOINT_NAMES {
                 let idx = get_joint_idx(joint);
                 line = line + &frame[idx].to_string() + " ";
             }
+
             line = line + "0.0 0.0\n";
             editor.write(line.as_bytes()).expect("Error writing editor");
         }
