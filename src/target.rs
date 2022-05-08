@@ -11,7 +11,7 @@ fn inv(speed: f64, sensor_value: f64, previous_error: f64) -> f64 {
 }
 
 impl Target {
-    pub fn from_params(file_path: &str) -> Target {
+    pub fn from_params(file_path: &str) -> Self {
         let mut lines = String::new();
         let mut params_file = File::open(file_path).expect("Error opening params file");
         params_file.read_to_string(&mut lines).unwrap();
@@ -43,10 +43,10 @@ impl Target {
             frame[idx] = line[1].parse().unwrap_or(0.0);
         }
         targets.push(frame);
-        Target { data: targets }
+        Self { data: targets }
     }
 
-    pub fn from_editor(file_path: &str) -> Target {
+    pub fn from_editor(file_path: &str) -> Self {
         let mut lines = String::new();
         let mut editor_file = File::open(file_path).expect("Error opening editor file");
         editor_file.read_to_string(&mut lines).unwrap();
@@ -72,10 +72,10 @@ impl Target {
             frame.push(wait);
             targets.push(frame);
         }
-        Target { data: targets }
+        Self { data: targets }
     }
 
-    pub fn from_pcap(file_path: &str) -> Target {
+    pub fn from_pcap(file_path: &str) -> Self {
         let mut cur_err = vec![0.0; 20];
         let mut pre_err = vec![0.0; 20];
 
@@ -107,7 +107,7 @@ impl Target {
         //             });
         //     });
 
-        Target { data: speeds }
+        Self { data: speeds }
     }
 
     pub fn print(&self) {
