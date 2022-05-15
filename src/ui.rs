@@ -108,6 +108,7 @@ impl DMApp {
 
         if fp_res != "none" && !fp_res.ends_with(".old") {
             let file_vec: Vec<_> = fp_res.split(".").collect();
+
             let params_update = match file_vec[file_vec.len() - 1] {
                 "edit" => Target::from_editor(fp_res),
                 "txt" => Target::from_params(fp_res),
@@ -151,7 +152,6 @@ impl DMApp {
 
         let fp_vec: Vec<_> = fp_vec[fp_vec.len() - 3].split(split_flag).collect();
         let file_name = fp_vec[fp_vec.len() - 1];
-        // println!("{}", file_name);
         match self.race_input.selection() {
             Some(0) => tt_res.into_skl(file_name),
             Some(1) => tt_res.into_editor(file_name),

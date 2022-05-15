@@ -10,8 +10,9 @@ fn format_data(msg: Vec<&str>) -> Vec<f64> {
     for joint in msg {
         let joint: Vec<_> = joint.split(' ').collect();
         // exclude head joints and other interference information
-        if joint.len() == 2 && joint[0].len() == 4 {
+        if joint.len() == 2 && joint[0].len() != 3 {
             let joint_name = joint[0].to_string();
+
             if &joint_name[2..3] != "e" && &joint_name[2..3] != "j" {
                 println!("Joint information error");
             }
@@ -20,7 +21,7 @@ fn format_data(msg: Vec<&str>) -> Vec<f64> {
 
             // exclude toe joints
             if joint_name == "ll7" || joint_name == "rl7" {
-                break;
+                continue;
             }
 
             let idx: usize = get_joint_idx(&joint_name);
@@ -66,17 +67,11 @@ pub fn parser(file_path: &str) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
 
     let mut speeds = Vec::new();
     // Parse the message sent by the agent
-    // for msg in agent_send {
-    //     let msg = msg.replace(")", "");
-    //     let msg: Vec<_> = msg.split("(").collect();
-    //     speeds.push(format_data(msg));
-    // }
-
-    agent_send.iter().for_each(|mut msg| {
-        let msg = &msg.replace(")", "");
+    for msg in agent_send {
+        let msg = msg.replace(")", "");
         let msg: Vec<_> = msg.split("(").collect();
         speeds.push(format_data(msg));
-    });
+    }
 
     println!(
         "robot receiving:[{}]  robot send:[{}]\nnumber of joints: {}",
