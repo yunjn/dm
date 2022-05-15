@@ -2,8 +2,8 @@
 #![allow(unused)]
 use crate::data::*;
 use crate::parser::*;
+use std::fs::File;
 use std::io::{Read, Write};
-use std::{fs, fs::File};
 
 #[inline]
 fn inv(speed: f64, sensor_value: f64, previous_error: f64) -> f64 {

@@ -8,8 +8,8 @@ use crate::data::*;
 use nwd::NwgUi;
 use nwg::NativeUi;
 use std::cell::RefCell;
-use std::env;
-use std::fs;
+use std::env::current_dir;
+use std::fs::create_dir_all;
 
 #[derive(Default, NwgUi)]
 pub struct DMApp {
@@ -41,7 +41,7 @@ pub struct DMApp {
 
 impl DMApp {
     pub fn check_dir(&self) {
-        fs::create_dir_all("assets/out/").unwrap_or_else(|why| {
+        create_dir_all("assets/out/").unwrap_or_else(|why| {
             println!("! {:?}", why.kind());
         });
     }
@@ -84,7 +84,7 @@ impl DMApp {
     }
 
     pub fn open_file(&self) {
-        if let Ok(d) = env::current_dir() {
+        if let Ok(d) = current_dir() {
             if let Some(d) = d.to_str() {
                 self.dialog
                     .set_default_folder(d)
