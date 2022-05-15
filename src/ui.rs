@@ -21,7 +21,7 @@ pub struct DMApp {
     #[nwg_events( OnWindowClose: [nwg::stop_thread_dispatch()],OnInit:[DMApp::img_frame,DMApp::check_dir],OnFileDrop: [DMApp::load_text(SELF, EVT_DATA)] )]
     window: nwg::Window,
 
-    #[nwg_control(size: (80, 20), position: (47, 150),collection: vec!["out","skl", "editor", "skl_txt"], selected_index: Some(0))]
+    #[nwg_control(size: (80, 20), position: (47, 150),collection: vec!["skl", "editor", "skl_txt"], selected_index: Some(0))]
     race_input: nwg::ComboBox<&'static str>,
 
     #[nwg_resource(title: "Open File", action: nwg::FileDialogAction::Open, filters: "Edit(*.edit)|TXT(*.txt)|Any (*.*)")]
@@ -153,9 +153,9 @@ impl DMApp {
         let file_name = fp_vec[fp_vec.len() - 1];
         // println!("{}", file_name);
         match self.race_input.selection() {
-            Some(1) => tt_res.into_skl(file_name),
-            Some(2) => tt_res.into_editor(file_name),
-            Some(3) => tt_res.into_skl_txt(file_name),
+            Some(0) => tt_res.into_skl(file_name),
+            Some(1) => tt_res.into_editor(file_name),
+            Some(2) => tt_res.into_skl_txt(file_name),
             _ => (),
         };
     }
