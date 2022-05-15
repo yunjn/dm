@@ -2,8 +2,8 @@
 #![allow(unused)]
 use crate::data::*;
 use crate::parser::*;
-use std::fs::File;
 use std::io::{Read, Write};
+use std::{fs, fs::File};
 
 #[inline]
 fn inv(speed: f64, sensor_value: f64, previous_error: f64) -> f64 {
@@ -11,6 +11,12 @@ fn inv(speed: f64, sensor_value: f64, previous_error: f64) -> f64 {
 }
 
 impl Target {
+    pub fn new() -> Self {
+        Self {
+            data: vec![vec![0.0]],
+        }
+    }
+
     pub fn from_params(file_path: &str) -> Self {
         let mut lines = String::new();
         let mut params_file = File::open(file_path).expect("Error opening params file");
@@ -239,7 +245,7 @@ impl Target {
 
     // For editor type
     pub fn into_editor(&self, file_name: &str) {
-        let mut editor = File::create("assets/out/".to_string() + file_name + ".txt")
+        let mut editor = File::create("assets/out/".to_string() + file_name + ".edit")
             .expect("Error creating file");
 
         for frame in &self.data {
