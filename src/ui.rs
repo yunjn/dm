@@ -138,12 +138,6 @@ impl DMApp {
 
         let fp_vec: Vec<_> = fp_res.split(".").collect();
 
-        if cfg!(target_os = "windows") {
-            let fp_vec: Vec<_> = fp_vec[fp_vec.len() - 3].split("\\").collect();
-        } else if cfg!(target_os = "linux") {
-            let fp_vec: Vec<_> = fp_vec[fp_vec.len() - 3].split("/").collect();
-        }
-
         let split_flag = if cfg!(target_os = "windows") {
             "\\"
         } else {
