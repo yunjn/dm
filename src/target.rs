@@ -25,7 +25,6 @@ impl Target {
 
         let mut targets: Vec<Vec<f64>> = Vec::new();
         let mut frame = vec![0.0f64; 21];
-        frame[20] = 0.02;
         let mut state = "s0";
 
         for line in lines.iter() {
@@ -46,7 +45,7 @@ impl Target {
                 targets.push(frame.clone());
             }
 
-            frame[idx] = line[1].parse().unwrap_or(0.0);
+            frame[idx] = line[1].parse().unwrap_or(0.02);
         }
         targets.push(frame);
         Self { data: targets }
@@ -61,13 +60,17 @@ impl Target {
         let frames: Vec<_> = lines.split('\n').collect();
 
         for frame_str in frames.iter() {
+            if frame_str.starts_with("/") || frame_str.starts_with("#") {
+                continue;
+            }
+
             let frame_str: Vec<_> = frame_str.split(' ').collect();
             // exclude blank line
             if frame_str.len() <= 2 {
                 continue;
             }
             let frame_str = &frame_str[0..frame_str.len() - 2];
-            let wait: f64 = frame_str[0].parse().unwrap_or(200.0);
+            let wait: f64 = frame_str[0].parse().unwrap_or(200.0) / 1000.0;
             let frame_str = &frame_str[3..];
             let mut frame: Vec<f64> = Vec::new();
 
@@ -191,7 +194,6 @@ impl Target {
 
             let mut left_str = String::from("settar");
             let mut right_str = String::from("\nsettar");
-            let mut index = 0i32;
 
             for joint in &JOINT_NAMES {
                 let idx = get_joint_idx(joint);
@@ -213,13 +215,27 @@ impl Target {
                     let line = joint_key + &joint_val;
                     right_str.push_str(&line);
                 }
-                index += 1;
             }
 
-            frame_idx += 1;
-            let wait = String::from("\nwait ")
-                + &(frame.get(20).unwrap_or(&200.0) / 1000.0).to_string()
+            let wait = String::from(file_name) // txt
+                + "_s"
+                + &frame_idx.to_string()
+                + "_wait"
+                + "\t"
+                + &frame[20].to_string()
+                + "\n";
+
+            txt.write(wait.as_bytes()).expect("Error writing params");
+
+            let wait = String::from("\nwait ") // skl
+                + "$"
+                + file_name
+                + "_s"
+                + &frame_idx.to_string()
+                + "_wait"
                 + " end\nENDSTATE\n\n";
+
+            frame_idx += 1;
 
             left_str.push_str(" end");
             right_str.push_str(" end");

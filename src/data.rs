@@ -28,13 +28,14 @@ pub fn get_joint_idx(joint_name: &str) -> usize {
         "ra2" => 17,
         "ra3" => 18,
         "ra4" => 19,
+        "wait" => 20,
         _ => usize::MAX,
     }
 }
 
 pub struct MetaData {
     data: f64,
-    t: u8, // 0 settar | 1 inctar | 2 reset | 3 wait
+    set_type: u8, // 0 settar | 1 inctar | 2 reset | 3 wait
 }
 
 pub struct Target {
