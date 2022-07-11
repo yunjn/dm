@@ -6,7 +6,7 @@
 
 ### Parser
 
-![regex](D:\Desktop\test_tmp\rs\dm\assets\regex.jpg)
+![regex](assets\regex.jpg)
 
 ### Tree
 
