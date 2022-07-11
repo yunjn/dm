@@ -7,5 +7,5 @@ mod ui;
 use ui::*;
 
 fn main() {
-    run();
+    run_app();
 }

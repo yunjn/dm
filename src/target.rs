@@ -88,7 +88,8 @@ impl Target {
         let mut cur_err = vec![0.0; 20];
         let mut pre_err = vec![0.0; 20];
 
-        let (sensor_values, mut speeds) = parser(file_path);
+        // let (sensor_values, mut speeds) = parser(file_path);
+        let (sensor_values, mut speeds) = parser_regex(file_path);
 
         for i in 0..speeds.len() {
             pre_err = cur_err.clone();
@@ -97,24 +98,6 @@ impl Target {
                 cur_err[j] = speeds[i][j] - sensor_values[i][j];
             }
         }
-
-        // speeds
-        //     .iter()
-        //     .zip(sensor_values.iter())
-        //     .for_each(|(sp, sv)| {
-        //         pre_err
-        //             .iter()
-        //             .zip(cur_err.iter())
-        //             .for_each(|(mut pe, ce)| pe = ce);
-
-        //         sp.iter()
-        //             .zip(sv.iter().zip(pre_err.iter().zip(cur_err.iter())))
-        //             .for_each(|(mut p, (v, (pe, mut ce)))| {
-        //                 let t = &inv(*p, *v, *pe);
-        //                 p = t;
-        //                 ce = &(t - *v);
-        //             });
-        //     });
 
         Self { data: speeds }
     }
@@ -142,6 +125,11 @@ impl Target {
 
             for joint in &JOINT_NAMES {
                 let idx = get_joint_idx(joint);
+
+                if idx == usize::MAX {
+                    continue;
+                }
+
                 let joint_key = String::from(" EFF_") + &joint.to_uppercase() + " ";
 
                 if &joint[0..1] == "l" {
@@ -197,6 +185,11 @@ impl Target {
 
             for joint in &JOINT_NAMES {
                 let idx = get_joint_idx(joint);
+
+                if idx == usize::MAX {
+                    continue;
+                }
+
                 // .skl
                 let joint_key = String::from(" EFF_") + &joint.to_uppercase() + " ";
                 let joint_val =
@@ -268,9 +261,8 @@ impl Target {
             let line = (frame.get(20).unwrap_or(&0.02) * 1000.0).to_string();
             let mut line = line + " 0 0 ";
 
-            for joint in &JOINT_NAMES {
-                let idx = get_joint_idx(joint);
-                line = line + &frame[idx].to_string() + " ";
+            for i in 0..20 {
+                line = line + &frame.get(i).unwrap_or(&0.0).to_string() + " ";
             }
 
             line = line + "0.0 0.0\n";

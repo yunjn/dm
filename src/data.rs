@@ -6,6 +6,7 @@ pub const JOINT_NAMES: [&str; 20] = [
     "rl4", "rl5", "rl6", "ra1", "ra2", "ra3", "ra4",
 ];
 
+// 选取关节
 pub fn get_joint_idx(joint_name: &str) -> usize {
     match joint_name as &str {
         "la1" => 0,

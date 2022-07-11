@@ -4,6 +4,10 @@
 
 </div>
 
+### Parser
+
+![regex](D:\Desktop\test_tmp\rs\dm\assets\regex.jpg)
+
 ### Tree
 
 ```txt
@@ -21,12 +25,15 @@
 └── src
     ├── data.rs
     ├── main.rs
+    ├── lib.rs
+	├── ui.rs
     ├── parser.rs
     └── target.rs
 ```
 
 ### Usage
 
+#### main.rs
 ```rust
 // 读取数据，需提供路径和完整文件名
 let mut target = Target::from_editor("assets/test.edit");
@@ -38,6 +45,34 @@ target.into_skl("test");
 target.into_editor("test");
 target.into_skl_txt("test");
 ```
+
+#### GUI
+
+* Input :  点击 “云” 图标选择文件或者将文件直接拖入“云”图标（支持格式：`pcapng` ,`txt`,`edit`,具体见#Format ）
+* Output : 左侧第一个按钮选择输出格式，run按钮执行
+
+
+#### 选取关节
+
+```Rust
+// src/data.rs/pub fn get_joint_idx(){}
+pub fn get_joint_idx(joint_name: &str) -> usize {
+    match joint_name as &str {
+        // "la1" => 0, // 丢弃la1
+        "la2" => 1,    // 选择la2
+        "la3" => 2,
+        "la4" => 3,
+        "ll1" => 4,
+        ···
+        "ra3" => 18,
+        "ra4" => 19,
+        "wait" => 20,
+        _ => usize::MAX,
+    }
+}
+```
+
+
 
 ### Format
 
@@ -91,3 +126,5 @@ test_s0_ll4	-26.5866875
 ```txt
 "la1", "la2", "la3", "la4", "ll1", "ll2", "ll3", "ll4", "ll5", "ll6", "rl1", "rl2","rl3","rl4", "rl5", "rl6", "ra1", "ra2", "ra3", "ra4",
 ```
+
+

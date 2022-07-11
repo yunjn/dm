@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+regex = "1.6.0"
 pcap-file = "1.1.1"
 native-windows-gui = "1.0.12"
 native-windows-derive = "1.0.3"

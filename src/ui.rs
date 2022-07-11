@@ -155,7 +155,7 @@ impl DMApp {
     }
 }
 
-pub fn run() {
+pub fn run_app() {
     nwg::init().expect("Failed to init Native Windows GUI");
     nwg::Font::set_global_family("MSYHL").expect("Failed to set default font");
     let _app = DMApp::build_ui(Default::default()).expect("Failed to build UI");
