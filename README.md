@@ -6,7 +6,7 @@
 
 ### Parser
 
-![regex](assets\regex.jpg)
+![regex](./assets/regex.jpg)
 
 ### Tree
 
